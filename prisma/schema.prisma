@@ -1,0 +1,59 @@
+// TrendSite data model. Postgres (Neon) for both local dev and production.
+// DATABASE_URL = Neon POOLED connection (used by the app at runtime).
+// DIRECT_URL   = Neon DIRECT connection (used by Prisma Migrate only).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Location {
+  id        Int        @id @default(autoincrement())
+  slug      String     @unique // e.g. "united-states"
+  name      String // e.g. "United States"
+  woeid     Int? // Yahoo "Where On Earth ID", used by most trend providers
+  snapshots Snapshot[]
+}
+
+// One row per hourly pull for a location. History is never deleted — it is the product.
+model Snapshot {
+  id         Int      @id @default(autoincrement())
+  locationId Int
+  capturedAt DateTime
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  trends     Trend[]
+
+  @@unique([locationId, capturedAt])
+  @@index([locationId, capturedAt])
+}
+
+model Trend {
+  id          Int      @id @default(autoincrement())
+  snapshotId  Int
+  rank        Int
+  name        String
+  url         String
+  tweetVolume Int?
+  snapshot    Snapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+
+  @@index([name])
+  @@index([snapshotId])
+}
+
+// LLM-generated "why is this trending?" guess, cached per location + trend name so
+// we only pay for one generation per distinct topic (not once per snapshot).
+model Explanation {
+  id          Int      @id @default(autoincrement())
+  locationId  Int
+  name        String
+  text        String
+  model       String
+  generatedAt DateTime @default(now())
+
+  @@unique([locationId, name])
+  @@index([locationId, name])
+}

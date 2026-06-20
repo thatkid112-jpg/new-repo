@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* "Newsprint + flame" editorial palette. Colors are space-separated RGB triples so
+   Tailwind can apply opacity via rgb(var(--token) / <alpha>). */
+:root {
+  --surface: 251 250 247; /* warm paper */
+  --card: 255 255 255;
+  --ink: 21 19 15; /* near-black ink */
+  --muted: 107 104 98;
+  --accent: 240 58 23; /* flame red-orange */
+  --accent-weak: 252 233 228; /* flame tint for badges/fills */
+  --border: 228 224 216; /* hairline */
+}
+
+.dark {
+  --surface: 14 14 16;
+  --card: 23 23 26;
+  --ink: 243 241 236;
+  --muted: 154 150 142;
+  --accent: 255 90 51; /* slightly brighter flame for dark */
+  --accent-weak: 51 26 20;
+  --border: 42 42 46;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background-color: rgb(var(--surface));
+  color: rgb(var(--ink));
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Subtle polish: gentle fade-in for primary content. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+  }
+}

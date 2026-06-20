@@ -1,0 +1,21 @@
+name: hourly-ingest
+
+# Hourly trigger for TrendSite's /api/ingest (free alternative to Vercel Cron,
+# which is limited to once/day on the Hobby plan). Also runnable on demand.
+on:
+  schedule:
+    - cron: "0 * * * *" # top of every hour (UTC); GitHub may delay during peak load
+  workflow_dispatch: {}
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger ingest
+        env:
+          INGEST_URL: ${{ secrets.INGEST_URL }}
+          INGEST_SECRET: ${{ secrets.INGEST_SECRET }}
+        run: |
+          curl -fsS -X POST "$INGEST_URL" \
+            -H "Authorization: Bearer $INGEST_SECRET" \
+            -w "\nHTTP %{http_code}\n"

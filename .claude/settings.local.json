@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:trends24.in)",
+      "WebSearch",
+      "Bash(npm run *)",
+      "Bash(node --env-file=.env -e ' *)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"TSC_EXIT=$?\")"
+    ]
+  }
+}
