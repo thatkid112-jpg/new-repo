@@ -13,3 +13,7 @@ prisma/dev.db-journal
 logs/
 
 next-env.d.ts
+
+# build artifact + local tool state
+tsconfig.tsbuildinfo
+.claude/settings.local.json
