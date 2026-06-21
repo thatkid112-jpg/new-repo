@@ -63,16 +63,19 @@ export function TrendModal({
   // ancestor (e.g. the .fade-in page wrapper) and is positioned against the viewport.
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/60"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={`${detail.name} details`}
     >
-      <div
-        className="w-full max-w-xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* min-h-full + overflow-y-auto on the parent lets tall modals scroll on mobile
+          instead of clipping (and trapping) the content. */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div
+          className="max-h-[85dvh] w-full max-w-xl overflow-y-auto rounded-xl border border-border bg-card shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-3">
@@ -164,6 +167,7 @@ export function TrendModal({
               View tweets on X
             </a>
           </div>
+        </div>
         </div>
       </div>
     </div>,

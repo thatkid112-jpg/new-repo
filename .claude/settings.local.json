@@ -6,7 +6,17 @@
       "Bash(npm run *)",
       "Bash(node --env-file=.env -e ' *)",
       "Bash(npx tsc *)",
-      "Bash(echo \"TSC_EXIT=$?\")"
+      "Bash(echo \"TSC_EXIT=$?\")",
+      "Bash(echo \"=== /united-states ===\")",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' https://new-repo-smoky-gamma.vercel.app/united-states)",
+      "Bash(echo \"=== live trends present? ===\")",
+      "Bash(curl -s https://new-repo-smoky-gamma.vercel.app/united-states)",
+      "Bash(curl -s -X POST https://new-repo-smoky-gamma.vercel.app/api/ingest?secret=0LjYn6K2d9V_cu3QyZ8oDxP-rHmW7KR9AstOyl0_Rwk -w '\\\\nHTTP %{http_code}\\\\n' --max-time 75)",
+      "Bash(curl -s \"https://api.github.com/repos/thatkid112-jpg/new-repo/actions/runs?per_page=3\" -H \"Accept: application/vnd.github+json\")",
+      "Bash(node -e ' *)",
+      "Bash(git add *)",
+      "Bash(git -c core.autocrlf=true commit -q -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
