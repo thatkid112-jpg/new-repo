@@ -1,10 +1,10 @@
 name: hourly-ingest
 
-# Hourly trigger for TrendSite's /api/ingest (free alternative to Vercel Cron,
-# which is limited to once/day on the Hobby plan). Also runnable on demand.
+# Manual/on-demand trigger for TrendSite's /api/ingest. GitHub's `schedule:`
+# trigger was removed: it's best-effort and was firing only every 6-8 hours
+# (or not at all) instead of hourly. Hourly cadence is now driven by an
+# external cron pinger (e.g. cron-job.org) hitting /api/ingest directly.
 on:
-  schedule:
-    - cron: "0 * * * *" # top of every hour (UTC); GitHub may delay during peak load
   workflow_dispatch: {}
 
 jobs:
