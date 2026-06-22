@@ -114,6 +114,7 @@ export default async function LocationPage({
         movement={movement}
         details={details}
         explanations={explanations}
+        limit={10}
       />
 
       {/* Secondary: summary stats + deeper views */}
