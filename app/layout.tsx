@@ -73,7 +73,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 X / Twitter trends
               </span>
             </Link>
-            <ThemeToggle />
+            <nav className="flex items-center gap-4">
+              <Link
+                href="/archive"
+                className="font-display text-xs font-medium uppercase tracking-[0.15em] text-muted transition-colors hover:text-ink"
+              >
+                Archive
+              </Link>
+              <Link
+                href="/account"
+                className="font-display text-xs font-medium uppercase tracking-[0.15em] text-muted transition-colors hover:text-ink"
+              >
+                Account
+              </Link>
+              <ThemeToggle />
+            </nav>
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
