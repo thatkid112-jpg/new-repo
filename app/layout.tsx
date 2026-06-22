@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
+import { siteUrl } from "@/lib/site";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -14,10 +15,29 @@ const body = Inter({
   variable: "--font-body",
 });
 
+const DESCRIPTION =
+  "Track X (Twitter) trending topics and hashtags in the United States over the past 24 hours — live ranked list, timeline, tag cloud, and AI explanations of why each topic is trending.";
+
 export const metadata: Metadata = {
-  title: "TrendSite — US X (Twitter) Trends, last 24 hours",
-  description:
-    "Track X (Twitter) trending topics and hashtags in the United States over the past 24 hours — timeline, tag cloud, and ranked table.",
+  metadataBase: new URL(siteUrl()),
+  title: {
+    default: "TrendSite — US X (Twitter) Trends, last 24 hours",
+    template: "%s · TrendSite",
+  },
+  description: DESCRIPTION,
+  applicationName: "TrendSite",
+  openGraph: {
+    type: "website",
+    siteName: "TrendSite",
+    title: "TrendSite — US X (Twitter) Trends, last 24 hours",
+    description: DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TrendSite — US X (Twitter) Trends, last 24 hours",
+    description: DESCRIPTION,
+  },
 };
 
 // Inline script set before paint to avoid a flash of the wrong theme.

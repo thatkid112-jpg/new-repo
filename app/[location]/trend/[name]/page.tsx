@@ -1,9 +1,35 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTrendHistory } from "@/lib/queries";
+import { getExplanations } from "@/lib/explain";
 import { RankSparkline } from "@/components/RankSparkline";
 
 export const revalidate = 900;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { location: string; name: string };
+}): Promise<Metadata> {
+  const name = decodeURIComponent(params.name);
+  const history = await getTrendHistory(params.location, name);
+  if (!history) return { title: `${name} — trend not found` };
+
+  const blurbs = await getExplanations(params.location, [name]);
+  const title = `${name} — why it's trending on X`;
+  const description =
+    blurbs[name] ??
+    `${name} is trending on X. See its rank over the last 24 hours, peak position, and how long it's been trending.`;
+  const canonical = `/${params.location}/trend/${encodeURIComponent(name)}`;
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { title, description, url: canonical },
+    twitter: { title, description },
+  };
+}
 
 function formatTime(d: Date): string {
   return new Intl.DateTimeFormat("en-US", {

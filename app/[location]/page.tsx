@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocationLast24h } from "@/lib/queries";
 import { computeStats, computeMovement, computeTrendDetails } from "@/lib/stats";
@@ -5,9 +6,33 @@ import { getExplanations } from "@/lib/explain";
 import { ViewTabs } from "@/components/ViewTabs";
 import { StatsPanel } from "@/components/StatsPanel";
 import { TrendList } from "@/components/TrendList";
+import { trendHref } from "@/lib/links";
+import { siteUrl } from "@/lib/site";
 
 // Re-render at most every 15 minutes; ingest writes new snapshots hourly.
 export const revalidate = 900;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { location: string };
+}): Promise<Metadata> {
+  const view = await getLocationLast24h(params.location);
+  if (!view) return {};
+  const top = (view.snapshots[0]?.trends ?? []).slice(0, 5).map((t) => t.name);
+  const title = `${view.name} — X (Twitter) Trends, last 24 hours`;
+  const description = top.length
+    ? `Trending now on X in the ${view.name}: ${top.join(", ")}. Live ranked list, rank movement, and AI explanations of why each topic is trending.`
+    : `Live X (Twitter) trends for the ${view.name} over the past 24 hours.`;
+  const canonical = `/${view.slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { title, description, url: canonical },
+    twitter: { title, description },
+  };
+}
 
 function updatedAgo(d: Date): string {
   const mins = Math.round((Date.now() - d.getTime()) / 60000);
@@ -49,8 +74,26 @@ export default async function LocationPage({
     latest.trends.map((t) => t.name)
   );
 
+  // JSON-LD ItemList of the current trends for rich search results.
+  const base = siteUrl();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${view.name} X (Twitter) trends`,
+    itemListElement: latest.trends.slice(0, 25).map((t) => ({
+      "@type": "ListItem",
+      position: t.rank,
+      name: t.name,
+      url: `${base}${trendHref(view.slug, t.name)}`,
+    })),
+  };
+
   return (
     <div className="fade-in space-y-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Editorial masthead for the page */}
       <header>
         <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-accent">
