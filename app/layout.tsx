@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import { siteUrl } from "@/lib/site";
 
 const display = Space_Grotesk({
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="mx-auto max-w-5xl border-t border-border px-4 py-8 text-sm text-muted">
           Unofficial. Trend data is scraped from public sources; “why” blurbs are AI-generated.
         </footer>
+        <Analytics />
       </body>
     </html>
   );
