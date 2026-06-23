@@ -91,9 +91,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-        <footer className="mx-auto max-w-5xl border-t border-border px-4 py-8 text-sm text-muted">
-          Unofficial. Trend data is scraped from public sources; “why” blurbs are AI-generated.
-        </footer>
         <Analytics />
       </body>
     </html>
