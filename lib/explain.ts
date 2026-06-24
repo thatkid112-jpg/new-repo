@@ -62,7 +62,7 @@ async function generateAnthropic(name: string): Promise<GenResult | null> {
 async function generateOpenRouter(name: string): Promise<GenResult | null> {
   if (!process.env.OPENROUTER_API_KEY) return null;
   const webGrounded = process.env.OPENROUTER_WEB_SEARCH === "true";
-  const baseModel = process.env.OPENROUTER_MODEL ?? "anthropic/claude-3.5-haiku";
+  const baseModel = process.env.OPENROUTER_MODEL ?? "deepseek/deepseek-v4-flash";
   const model = webGrounded ? `${baseModel}:online` : baseModel;
 
   const client = new OpenAI({
