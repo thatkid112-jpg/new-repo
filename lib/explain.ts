@@ -28,6 +28,17 @@ function buildSystemPrompt(webGrounded: boolean): string {
 
 const USER_PROMPT = (name: string) => `Why is "${name}" trending on X right now?`;
 
+// Web-grounded models (notably DeepSeek's ":online" mode) embed inline markdown citation
+// links straight into the answer regardless of prompt instructions. Strip them deterministically
+// so the cached blurb is just the summary sentence.
+export function stripCitations(text: string): string {
+  return text
+    .replace(/\[[^\]]*\]\(https?:\/\/[^\s)]+\)/g, "")
+    .replace(/\s+([.,!?])/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 export function explanationsEnabled(): boolean {
   return providerId() === "openrouter"
     ? Boolean(process.env.OPENROUTER_API_KEY)
@@ -104,7 +115,8 @@ export async function getOrCreateExplanation(
   try {
     const res = await generate(name);
     if (!res || !res.text) return null;
-    const { text, model } = res;
+    const text = stripCitations(res.text);
+    const { model } = res;
 
     await prisma.explanation.upsert({
       where: { locationId_name: { locationId, name } },
