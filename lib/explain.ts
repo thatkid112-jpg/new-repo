@@ -15,7 +15,9 @@ function providerId(): ProviderId {
 // The user-facing prompt, shared across providers. When `webGrounded` we instruct the
 // model to search; otherwise it answers from its own knowledge.
 function buildSystemPrompt(webGrounded: boolean): string {
+  const today = new Date().toISOString().slice(0, 10);
   return (
+    `Today is ${today}. ` +
     "You explain why a topic is trending on X (Twitter) in the United States. " +
     (webGrounded
       ? "Search the web for the most recent reason this topic is trending right now, then "
@@ -74,7 +76,13 @@ async function generateOpenRouter(name: string): Promise<GenResult | null> {
   if (!process.env.OPENROUTER_API_KEY) return null;
   const webGrounded = process.env.OPENROUTER_WEB_SEARCH === "true";
   const baseModel = process.env.OPENROUTER_MODEL ?? "deepseek/deepseek-v4-flash";
-  const model = webGrounded ? `${baseModel}:online` : baseModel;
+
+  // Perplexity Sonar models ground natively (and far cheaper than the Exa fallback), so we
+  // never append ":online" to them — doing so would stack the web plugin on top and double-charge.
+  // They are always grounded regardless of OPENROUTER_WEB_SEARCH.
+  const isPerplexity = baseModel.startsWith("perplexity/");
+  const grounded = isPerplexity || webGrounded;
+  const model = webGrounded && !isPerplexity ? `${baseModel}:online` : baseModel;
 
   const client = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
@@ -82,14 +90,21 @@ async function generateOpenRouter(name: string): Promise<GenResult | null> {
     defaultHeaders: { "X-Title": "TrendSite" },
   });
 
-  const completion = await client.chat.completions.create({
+  // `search_recency_filter` is a Perplexity-specific param (forwarded by OpenRouter) that biases
+  // grounding toward the last week — ideal for "why is this trending right now". Cast to any since
+  // it isn't part of the OpenAI SDK's typed params.
+  const params: Record<string, unknown> = {
     model,
     max_tokens: 200,
     messages: [
-      { role: "system", content: buildSystemPrompt(webGrounded) },
+      { role: "system", content: buildSystemPrompt(grounded) },
       { role: "user", content: USER_PROMPT(name) },
     ],
-  });
+  };
+  if (isPerplexity) params.search_recency_filter = "week";
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const completion = await client.chat.completions.create(params as any);
 
   return { text: (completion.choices[0]?.message?.content ?? "").trim(), model };
 }
