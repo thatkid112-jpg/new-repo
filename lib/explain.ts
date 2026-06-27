@@ -18,12 +18,13 @@ function buildSystemPrompt(webGrounded: boolean): string {
   const today = new Date().toISOString().slice(0, 10);
   return (
     `Today is ${today}. ` +
-    "You explain why a topic is trending on X (Twitter) in the United States. " +
+    "You explain why a topic is trending on X (Twitter) in the United States right now. " +
     (webGrounded
-      ? "Search the web for the most recent reason this topic is trending right now, then "
-      : "Using your knowledge, give the most plausible reason this topic is trending, then ") +
-    "reply with ONE concise sentence (max 25 words) stating that reason. " +
-    "If nothing specific is found, give the most plausible general reason. " +
+      ? "Search for the single most recent specific event, statement, post, or news from the last 24 hours " +
+        "that triggered the spike; if several reasons exist, choose the NEWEST one. "
+      : "Using your knowledge, give the most plausible specific reason it is trending. ") +
+    "Reply with ONE sentence (max 30 words) naming the specific event and roughly when it happened. " +
+    "If no clear recent event is found, give the most plausible current reason. " +
     "Do not add preamble, caveats, citations, or quotation marks — respond only with the sentence."
   );
 }
@@ -101,7 +102,7 @@ async function generateOpenRouter(name: string): Promise<GenResult | null> {
       { role: "user", content: USER_PROMPT(name) },
     ],
   };
-  if (isPerplexity) params.search_recency_filter = "week";
+  if (isPerplexity) params.search_recency_filter = "day";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const completion = await client.chat.completions.create(params as any);
